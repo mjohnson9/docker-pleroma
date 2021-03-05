@@ -3,7 +3,7 @@ FROM elixir:1.11.2-alpine
 ENV UID=911 GID=911 \
     MIX_ENV=prod
 
-ARG PLEROMA_VER=develop
+ARG PLEROMA_VER=stable
 
 RUN apk -U upgrade \
     && apk add --no-cache \
@@ -18,7 +18,7 @@ RUN addgroup -g ${GID} pleroma \
 USER pleroma
 WORKDIR /pleroma
 
-RUN git clone -b develop https://git.pleroma.social/pleroma/pleroma.git /pleroma \
+RUN git clone -b stable https://git.pleroma.social/pleroma/pleroma.git /pleroma \
     && git checkout ${PLEROMA_VER}
 
 COPY config/secret.exs /pleroma/config/prod.secret.exs
