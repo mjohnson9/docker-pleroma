@@ -13,8 +13,8 @@ build:
     - cd ..
     - rm -r -f pleroma
   script:
-    - docker build --pull -t "$VERSION" .
-    - docker push "$VERSION"
+    - docker build --pull -t $CI_REGISTRY_IMAGE:$VERSION .
+    - docker push $CI_REGISTRY_IMAGE:$VERSION
 
 include:
   - template: Container-Scanning.gitlab-ci.yml
