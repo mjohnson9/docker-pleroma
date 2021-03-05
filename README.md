@@ -21,7 +21,7 @@ Thus you will need to build the image yourself, but I explain how to do it below
 
 ## Build-time variables
 
-- **`PLEROMA_VER`** : Pleroma version (latest commit of the [`develop` branch](https://git.pleroma.social/pleroma/pleroma) by default)
+- **`PLEROMA_VER`** : Pleroma version (latest commit of the [`stable` branch](https://git.pleroma.social/pleroma/pleroma) by default)
 - **`GID`**: group id (default: `911`)
 - **`UID`**: user id (default: `911`)
 
@@ -161,7 +161,7 @@ You can now setup a Nginx reverse proxy in a container or on your host by using 
 
 ### Update
 
-By default, the Dockerfile will be built from the latest commit of the `develop` branch as Pleroma does not have releases for now.
+By default, the Dockerfile will be built from the latest commit of the `stable` branch.
 
 Thus to update, just rebuild your image and recreate your containers:
 
@@ -182,7 +182,7 @@ docker build -t pleroma . --build-arg PLEROMA_VER=a9203ab3 # a commit
 docker build -t pleroma . --build-arg PLEROMA_VER=v2.0.7 # a version
 ```
 
-`a9203ab3` being the hash of the commit. (They're [here](https://git.pleroma.social/pleroma/pleroma/commits/develop))
+`a9203ab3` being the hash of the commit. (They're [here](https://git.pleroma.social/pleroma/pleroma/commits/stable))
 
 ## Other Docker images
 
