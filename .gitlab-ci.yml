@@ -7,10 +7,12 @@ build:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - apk add git
+    - git pull -b stable https://git.pleroma.social/pleroma
     - VERSION=$(git describe --tags --abbrev=0)
+    - rm -r -f pleroma
   script:
     - docker build --pull -t "$VERSION" .
-    - docker push "$CI_REGISTRY_IMAGE"
+    - docker push "$VERSION"
 
 include:
   - template: Container-Scanning.gitlab-ci.yml
