@@ -13,11 +13,12 @@ build:
     - cd ..
     - rm -r -f pleroma
   script:
-    - docker build --pull -t $CI_REGISTRY_IMAGE:$VERSION .
+    - docker build --pull -t $CI_REGISTRY_IMAGE:$VERSION -t $CI_REGISTRY_IMAGE:latest .
     - docker push $CI_REGISTRY_IMAGE:$VERSION
+    - docker push $CI_REGISTRY_IMAGE:latest
 
 include:
   - template: Container-Scanning.gitlab-ci.yml
 
 variables:
-  DOCKER_IMAGE: $CI_REGISTRY_IMAGE:$VERSION
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE:latest
