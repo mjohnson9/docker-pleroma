@@ -1,1 +1,16 @@
+build:
+  # Official docker image.
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - apk add git
+    - VERSION=$(git describe --tags --abbrev=0)
+  script:
+    - docker build --pull -t "$VERSION" .
+    - docker push "$CI_REGISTRY_IMAGE"
 
+include:
+  - template: Container-Scanning.gitlab-ci.yml
