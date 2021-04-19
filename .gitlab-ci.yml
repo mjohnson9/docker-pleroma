@@ -18,7 +18,12 @@ build:
     - docker push $CI_REGISTRY_IMAGE:latest
 
 include:
-  - template: Container-Scanning.gitlab-ci.yml
+  - template: Security/Container-Scanning.gitlab-ci.yml
 
 variables:
   DOCKER_IMAGE: $CI_REGISTRY_IMAGE:latest
+
+container_scanning:
+  variables:
+    GIT_STRATEGY: fetch
+    DOCKERFILE_PATH: "./Dockerfile"  
