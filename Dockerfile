@@ -23,13 +23,11 @@ RUN git clone -b stable https://git.pleroma.social/pleroma/pleroma.git /pleroma 
 
 COPY config/secret.exs /pleroma/config/prod.secret.exs
 
-RUN mix local.rebar --force \
-    && mix local.hex --force \
-    && mix deps.get \
-    && mix compile || mix local.rebar --force \
-    && mix local.hex --force \
-    && mix deps.get \
-    && mix compile
+RUN mix local.hex --force \
+    && mix local.rebar --force \
+    && mix deps.get --only prod \
+    && mkdir release \
+    && mix release --path /pleroma
 
 VOLUME /pleroma/uploads/
 
