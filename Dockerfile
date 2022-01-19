@@ -27,6 +27,7 @@ RUN mix local.hex --force \
     && mix local.rebar --force \
     && mix deps.get --only prod \
     && mkdir release \
+    && mix release --path /pleroma || mix deps.get --only prod \
     && mix release --path /pleroma
 
 VOLUME /pleroma/uploads/
