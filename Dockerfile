@@ -26,6 +26,9 @@ COPY config/secret.exs /pleroma/config/prod.secret.exs
 RUN mix local.rebar --force \
     && mix local.hex --force \
     && mix deps.get \
+    && mix compile || mix local.rebar --force \
+    && mix local.hex --force \
+    && mix deps.get \
     && mix compile
 
 VOLUME /pleroma/uploads/
