@@ -23,8 +23,8 @@ RUN mkdir -p /etc/pleroma \
 USER pleroma
 WORKDIR /pleroma
 
-RUN git clone -b develop https://git.pleroma.social/pleroma/pleroma.git /pleroma \
-    && git checkout ${PLEROMA_VER} 
+RUN git clone -b stable https://git.pleroma.social/pleroma/pleroma.git /pleroma \
+    && git checkout ${PLEROMA_VER}
 
 RUN echo "import Mix.Config" > config/prod.secret.exs \
     && mix local.hex --force \
