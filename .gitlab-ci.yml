@@ -26,4 +26,4 @@ variables:
 container_scanning:
   variables:
     GIT_STRATEGY: fetch
-    DOCKERFILE_PATH: "./Dockerfile"  
+    DOCKERFILE_PATH: "./Dockerfile"

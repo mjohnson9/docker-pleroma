@@ -34,31 +34,50 @@ Create a folder for your Pleroma instance. Inside, you should have `Dockerfile` 
 Here is the `docker-compose.yml`. You should change the `POSTGRES_PASSWORD` variable.
 
 ```yaml
-version: '2.3'
+version: '3.8'
 
 services:
-  postgres:
-    image: postgres:9.6-alpine
-    container_name: pleroma_postgres
+  db:
+    image: postgres:12.1-alpine
+    container_name: pleroma_db
     restart: always
     environment:
       POSTGRES_USER: pleroma
-      POSTGRES_PASSWORD: pleroma
+      POSTGRES_PASSWORD: ChangeMe!
       POSTGRES_DB: pleroma
     volumes:
       - ./postgres:/var/lib/postgresql/data
 
   web:
-    build: .
     image: pleroma
     container_name: pleroma_web
     restart: always
     ports:
-      - '127.0.0.1:4000:4000'
+      - '4000:4000'
+    build:
+      context: .
+      # Feel free to remove or override this section
+      # See 'Build-time variables' in README.md
+      args:
+        - "UID=911"
+        - "GID=911"
+        - "PLEROMA_VER=develop"
     volumes:
-      - ./uploads:/pleroma/uploads
+      - ./uploads:/var/lib/pleroma/uploads
+      - ./static:/var/lib/pleroma/static
+      - ./config.exs:/etc/pleroma/config.exs:ro
+      # optional, see 'Config Override' section in README.md
+      # - ./config-override.exs:/var/lib/pleroma/config.exs:ro
+    environment:
+      DOMAIN: example.com
+      INSTANCE_NAME: Pleroma
+      ADMIN_EMAIL: admin@example.com
+      NOTIFY_EMAIL: notify@example.com
+      DB_USER: pleroma
+      DB_PASS: ChangeMe!
+      DB_NAME: pleroma
     depends_on:
-      - postgres
+      - db
 ```
 
 Create the upload and config folder and give write permissions for the uploads:
@@ -71,50 +90,12 @@ chown -R 911:911 uploads
 Pleroma needs the `citext` PostgreSQL extension, here is how to add it:
 
 ```sh
-docker-compose up -d postgres
-docker exec -i pleroma_postgres psql -U pleroma -c "CREATE EXTENSION IF NOT EXISTS citext;"
+docker-compose up -d db
+docker exec -i pleroma_db psql -U pleroma -c "CREATE EXTENSION IF NOT EXISTS citext;"
 docker-compose down
 ```
 
-Configure Pleroma. Copy the following to `config/secret.exs`:
-
-```exs
-use Mix.Config
-
-config :pleroma, Pleroma.Web.Endpoint,
-   http: [ ip: {0, 0, 0, 0}, ],
-   url: [host: "pleroma.domain.tld", scheme: "https", port: 443],
-   secret_key_base: "<use 'openssl rand -base64 48' to generate a key>"
-
-config :pleroma, :instance,
-  name: "Pleroma",
-  email: "admin@email.tld",
-  limit: 5000,
-  registrations_open: true
-
-config :pleroma, :media_proxy,
-  enabled: false,
-  redirect_on_failure: true,
-  base_url: "https://cache.domain.tld"
-
-# Configure your database
-config :pleroma, Pleroma.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "pleroma",
-  password: "pleroma",
-  database: "pleroma",
-  hostname: "postgres",
-  pool_size: 10
-```
-
-You need to change at least:
-
-- `host`
-- `secret_key_base`
-- `email`
-
-Make sure your PostgreSQL parameters are ok.
-
+Optionally configure Pleroma, see [Config Override](#config-override).
 You can now build the image. 2 way of doing it:
 
 ```sh
@@ -123,27 +104,7 @@ docker-compose build
 docker build -t pleroma .
 ```
 
-I prefer the latter because it's more verbose.
-
-Setup the database:
-
-```sh
-docker-compose run --rm web mix ecto.migrate
-```
-
-Get your web push keys and copy them to `secret.exs`:
-
-```
-docker-compose run --rm web mix web_push.gen.keypair
-```
-
-You will need to build the image again, to pick up your updated `secret.exs` file:
-
-```
-docker-compose build
-# or
-docker build -t pleroma .
-```
+I prefer the latter because it's more verbose but this will ignore any build-time variables you have set in `docker-compose.yml`.
 
 You can now launch your instance:
 
@@ -151,10 +112,16 @@ You can now launch your instance:
 docker-compose up -d
 ```
 
-Check if everything went well with:
+The initial creation of the database schema will be done automatically. Check if everything went well with:
 
 ```sh
 docker logs -f pleroma_web
+```
+
+Make a new admin user using docker exec (replace fakeadmin with any username you'd like):
+
+```sh
+docker exec -it pleroma_web sh ./bin/pleroma_ctl user new fakeadmin admin@test.net --admin
 ```
 
 You can now setup a Nginx reverse proxy in a container or on your host by using the [example Nginx config](https://git.pleroma.social/pleroma/pleroma/blob/develop/installation/pleroma.nginx).
@@ -183,6 +150,14 @@ docker build -t pleroma . --build-arg PLEROMA_VER=v2.0.7 # a version
 ```
 
 `a9203ab3` being the hash of the commit. (They're [here](https://git.pleroma.social/pleroma/pleroma/commits/stable))
+
+This value can also be set through `docker-compose.yml` as seen in the example file provided in this repository.
+
+## Config Override
+By default the provided `docker-compose.yml` file mounts `config.exs` in the Pleroma container, this file is a dynamic configuration that sources some values from the environment variables provided to the container (variables like `ADMIN_EMAIL` etc.).
+
+For those that want to change configuration that is not exposed through environment variables there is the option to mount the `config-override.exs` file which can than be modified to your satisfaction. Values set in this file will override anything set in `config.exs`. The override file provided in this repository disables new registrations on your instance, as an example.
+=======
 
 ## Other Docker images
 
