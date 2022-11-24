@@ -1,4 +1,4 @@
-FROM elixir:1.14.2-alpine
+FROM elixir:1.11.4-alpine
 
 ARG PLEROMA_VER=v2.4.4
 ARG UID=911
