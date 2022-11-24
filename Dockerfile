@@ -4,7 +4,7 @@ ARG PLEROMA_VER=v2.4.4
 ARG UID=911
 ARG GID=911
 ENV MIX_ENV=prod
-ENV OAUTH_CONSUMER_STRATEGIES="twitter facebook google microsoft keycloak:keycloak_strategy"
+ENV OAUTH_CONSUMER_STRATEGIES="keycloak:ueberauth_keycloak_strategy"
 
 RUN apk update \
     && apk add git gcc g++ musl-dev make cmake file-dev \
