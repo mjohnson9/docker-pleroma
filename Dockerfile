@@ -4,6 +4,7 @@ ARG PLEROMA_VER=stable
 ARG UID=911
 ARG GID=911
 ENV MIX_ENV=prod
+ENV OAUTH_CONSUMER_STRATEGIES="twitter facebook google microsoft keycloak"
 
 RUN echo "http://nl.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories \
     && apk update \
