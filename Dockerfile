@@ -1,10 +1,10 @@
 FROM elixir:1.14.2-alpine
 
-ARG PLEROMA_VER=stable
+ARG PLEROMA_VER=v2.4.4
 ARG UID=911
 ARG GID=911
 ENV MIX_ENV=prod
-ENV OAUTH_CONSUMER_STRATEGIES="twitter facebook google microsoft keycloak"
+ENV OAUTH_CONSUMER_STRATEGIES="twitter facebook google microsoft keycloak_strategy"
 
 RUN apk update \
     && apk add git gcc g++ musl-dev make cmake file-dev \
@@ -23,8 +23,7 @@ RUN mkdir -p /etc/pleroma \
 USER pleroma
 WORKDIR /pleroma
 
-RUN git clone -b v2.4.4 https://git.pleroma.social/pleroma/pleroma.git /pleroma \
-    && git checkout ${PLEROMA_VER}
+RUN git clone --depth=1 -b "${PLEROMA_VER}" https://git.pleroma.social/pleroma/pleroma.git /pleroma
 
 RUN echo "import Mix.Config" > config/prod.secret.exs \
     && mix local.hex --force \
