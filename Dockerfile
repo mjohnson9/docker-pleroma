@@ -6,8 +6,7 @@ ARG GID=911
 ENV MIX_ENV=prod
 ENV OAUTH_CONSUMER_STRATEGIES="twitter facebook google microsoft keycloak"
 
-RUN echo "http://nl.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories \
-    && apk update \
+RUN apk update \
     && apk add git gcc g++ musl-dev make cmake file-dev \
     exiftool imagemagick libmagic ncurses postgresql-client ffmpeg
 
